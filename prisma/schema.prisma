@@ -1,0 +1,270 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BUYER
+  SELLER
+  BOTH
+  ADMIN
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING
+  VERIFIED
+  LIVE
+  SOLD
+  EXPIRED
+  REJECTED
+}
+
+enum EscrowStatus {
+  HELD
+  RELEASED
+  REFUNDED
+}
+
+enum DisputeStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+}
+
+enum Category {
+  FASHION
+  ELECTRONICS
+  FOOD_DINING
+  LIFESTYLE
+  TRAVEL
+  ENTERTAINMENT
+  HEALTH_BEAUTY
+  GROCERY
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  name            String
+  avatar          String?
+  role            Role           @default(BUYER)
+  passwordHash    String?
+  googleId        String?        @unique
+  isVerified      Boolean        @default(false)
+  repScore        Float          @default(5.0)
+  totalSales      Int            @default(0)
+  totalPurchases  Int            @default(0)
+  referralCode    String?        @unique
+  referredBy      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // FEATURE 4 — Fraud Detection: track sellers with repeated duplicate/rejected listings
+  flaggedForReview Boolean       @default(false)
+  flaggedCount     Int           @default(0)
+
+  // FEATURE 6 — Seller Verification: timestamp when email was verified, optional phone
+  sellerVerifiedAt DateTime?
+  phoneNumber      String?
+
+  listings        VoucherListing[]
+  buyerOrders     Order[]        @relation("BuyerOrders")
+  sellerOrders    Order[]        @relation("SellerOrders")
+  givenReviews    Review[]       @relation("ReviewGiver")
+  receivedReviews Review[]       @relation("ReviewReceiver")
+  disputes        Dispute[]
+  wishlists       Wishlist[]
+  chatRoomsBuyer  ChatRoom[]     @relation("ChatBuyer")
+  chatRoomsSeller ChatRoom[]     @relation("ChatSeller")
+  chatMessages    ChatMessage[]
+  notifications   Notification[]
+  bulkUploads     BulkUpload[]
+  verificationTokens VerificationToken[]
+  auditLogs       AuditLog[]
+}
+
+model VoucherListing {
+  id                     String         @id @default(uuid())
+  sellerId               String
+  seller                 User           @relation(fields: [sellerId], references: [id])
+  brand                  String
+  category               Category
+  faceValue              Float
+  askingPrice            Float
+  discountPct            Float
+  expiryDate             DateTime
+  description            String?
+  voucherCode            String?        // AES-256-GCM encrypted (Feature 2); revealed only to buyer after payment
+  voucherImageUrl        String?
+  receiptUrl             String?
+  status                 ListingStatus  @default(DRAFT)
+  verificationNotes      String?
+  verifiedAt             DateTime?
+  verifiedBy             String?
+  isFeatured             Boolean        @default(false)
+  isPriorityVerification Boolean        @default(false)
+  viewCount              Int            @default(0)
+  tags                   String[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  // FEATURE 4 — Fraud Detection: SHA-256 hash of raw voucher code for duplicate check without storing plaintext
+  voucherCodeHash        String?
+
+  // FEATURE 8 — One-Time Redemption: once revealed to buyer, never reveal again to anyone else
+  isCodeRevealed         Boolean        @default(false)
+  codeRevealedAt         DateTime?
+
+  orders                 Order[]
+  chatRooms              ChatRoom[]
+}
+
+model Order {
+  id                String        @id @default(uuid())
+  listingId         String
+  listing           VoucherListing @relation(fields: [listingId], references: [id])
+  buyerId           String
+  buyer             User          @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId          String
+  seller            User          @relation("SellerOrders", fields: [sellerId], references: [id])
+  amount            Float
+  commission        Float
+  sellerEarnings    Float
+  escrowStatus      EscrowStatus  @default(HELD)
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  paymentCapturedAt DateTime?
+  confirmedAt       DateTime?
+  autoReleaseAt     DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  review            Review?
+  dispute           Dispute?
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  orderId     String   @unique
+  order       Order    @relation(fields: [orderId], references: [id])
+  reviewerId  String
+  reviewer    User     @relation("ReviewGiver", fields: [reviewerId], references: [id])
+  revieweeId  String
+  reviewee    User     @relation("ReviewReceiver", fields: [revieweeId], references: [id])
+  rating      Int      // 1-5
+  comment     String?
+  createdAt   DateTime @default(now())
+}
+
+model Dispute {
+  id          String        @id @default(uuid())
+  orderId     String        @unique
+  order       Order         @relation(fields: [orderId], references: [id])
+  raisedById  String
+  raisedBy    User          @relation(fields: [raisedById], references: [id])
+  reason      String
+  evidence    String?
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  adminNote   String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Wishlist {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  brand       String?
+  category    Category?
+  maxPrice    Float?
+  notifyEmail Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+}
+
+model ChatRoom {
+  id          String         @id @default(uuid())
+  listingId   String
+  listing     VoucherListing @relation(fields: [listingId], references: [id])
+  buyerId     String
+  buyer       User           @relation("ChatBuyer", fields: [buyerId], references: [id])
+  sellerId    String
+  seller      User           @relation("ChatSeller", fields: [sellerId], references: [id])
+  createdAt   DateTime       @default(now())
+
+  messages    ChatMessage[]
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  roomId    String
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // LISTING_VERIFIED, ORDER_PLACED, ESCROW_RELEASED, DISPUTE_OPENED, etc.
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BulkUpload {
+  id             String   @id @default(uuid())
+  companyName    String
+  uploadedById   String
+  uploadedBy     User     @relation(fields: [uploadedById], references: [id])
+  fileUrl        String
+  status         String   @default("PROCESSING") // PROCESSING, COMPLETED, FAILED
+  totalCount     Int      @default(0)
+  processedCount Int      @default(0)
+  errorLog       String?
+  createdAt      DateTime @default(now())
+}
+
+model PlatformConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// FEATURE 6 — Seller Verification: time-limited OTP tokens for email/phone verification
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  type      String   // EMAIL_VERIFY | PASSWORD_RESET
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// FEATURE 7 — Secure Transaction Records: append-only audit log; no updatedAt to prevent editing
+// Every escrow state transition is recorded here by auditService.ts
+model AuditLog {
+  id        String   @id @default(uuid())
+  orderId   String?  // nullable — some events (e.g. listing verify) are not order-scoped
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   // ORDER_CREATED | PAYMENT_CAPTURED | CODE_REVEALED | REDEEMED | DISPUTE_RAISED | ESCROW_RELEASED | ESCROW_REFUNDED | LISTING_VERIFIED | LISTING_REJECTED
+  metadata  Json?    // arbitrary key-value context (amount, brand, ip, etc.)
+  ipAddress String?
+  createdAt DateTime @default(now())
+  // Intentionally NO updatedAt — this model is append-only and must never be mutated
+}
