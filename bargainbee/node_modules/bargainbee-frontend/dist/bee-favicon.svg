@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="#F5C518"/>
+  <ellipse cx="50" cy="52" rx="28" ry="32" fill="#1A1A1A"/>
+  <ellipse cx="50" cy="52" rx="24" ry="28" fill="#F5C518"/>
+  <!-- Stripes -->
+  <path d="M 28 42 Q 50 46 72 42 L 72 48 Q 50 52 28 48 Z" fill="#1A1A1A"/>
+  <path d="M 28 58 Q 50 62 72 58 L 72 64 Q 50 68 28 64 Z" fill="#1A1A1A"/>
+  <!-- Eyes -->
+  <circle cx="42" cy="32" r="4" fill="#1A1A1A"/>
+  <circle cx="58" cy="32" r="4" fill="#1A1A1A"/>
+  <!-- Wings -->
+  <ellipse cx="32" cy="22" rx="14" ry="8" fill="#FFFFFF" opacity="0.8" transform="rotate(-30 32 22)"/>
+  <ellipse cx="68" cy="22" rx="14" ry="8" fill="#FFFFFF" opacity="0.8" transform="rotate(30 68 22)"/>
+</svg>

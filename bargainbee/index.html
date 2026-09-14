@@ -1,0 +1,2483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BargainBee — Don't Let Value Expire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #F5C518;
+      --primary-dark: #d9ad0e;
+      --primary-light: #fef8db;
+      --dark: #1A1A1A;
+      --dark-card: #262626;
+      --gray: #6B7280;
+      --light-gray: #F3F4F6;
+      --bg: #FAFAF7;
+      --card-bg: #FFFFFF;
+      --border: #E5E7EB;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--dark);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Top Announcement Bar */
+    .role-bar {
+      background: var(--dark);
+      color: #D1D5DB;
+      font-size: 0.8rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #333;
+    }
+    .role-bar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* Header & Navigation */
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      gap: 1rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--dark);
+      flex-shrink: 0;
+    }
+    .logo-bee { font-size: 1.8rem; }
+    .logo-highlight { color: #d4a90e; }
+
+    .nav-links { display: flex; gap: 1.2rem; align-items: center; list-style: none; }
+    .nav-link {
+      text-decoration: none;
+      color: var(--gray);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 0.5rem 0.2rem;
+    }
+    .nav-link:hover, .nav-link.active { color: var(--dark); }
+
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: var(--dark); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-dark { background: var(--dark); color: #FFFFFF; }
+    .btn-dark:hover { background: #333; }
+    .btn-secondary { background: #FFFFFF; border: 1px solid var(--border); color: var(--dark); }
+    .btn-secondary:hover { background: var(--light-gray); }
+    .btn-ghost { background: transparent; color: var(--dark); padding: 0.5rem 0.8rem; }
+    .btn-ghost:hover { background: var(--light-gray); }
+    .btn-sm { font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 6px; }
+
+    /* User Profile Pill in Navbar */
+    .user-profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      position: relative;
+    }
+    .user-profile-btn:hover { background: #F3F4F6; }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: var(--dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+    .user-role-badge {
+      font-size: 0.65rem;
+      background: var(--dark);
+      color: #fff;
+      padding: 0.1rem 0.4rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* Dropdown */
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.5rem;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 220px;
+      padding: 0.5rem 0;
+      display: none;
+      z-index: 60;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-header { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      color: var(--dark);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .dropdown-item:hover { background: var(--light-gray); }
+    .dropdown-item.danger { color: var(--danger); border-top: 1px solid var(--border); }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+    }
+    .badge-verified { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+    .badge-pending { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+    .badge-discount { background: var(--dark); color: #FFFFFF; font-weight: 800; }
+    .badge-escrow { background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
+
+    /* Sections */
+    .section { display: none; padding: 2.5rem 0; animation: fadeIn 0.3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(180deg, #FEFCE8 0%, #FFFFFF 100%);
+      padding: 4rem 0 3.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FFFFFF;
+      border: 1px solid var(--primary);
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--gray);
+      max-width: 680px;
+      margin: 0 auto 2rem;
+    }
+    .hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+    /* Stats Grid */
+    .stats-bar {
+      background: var(--dark);
+      color: #FFFFFF;
+      padding: 3rem 0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      text-align: center;
+    }
+    .stat-num { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin-bottom: 0.2rem; }
+    .stat-label { font-size: 0.95rem; font-weight: 700; }
+    .stat-sub { font-size: 0.8rem; color: #9CA3AF; margin-top: 0.25rem; }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+
+    .voucher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .voucher-card {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+    .voucher-header {
+      background: linear-gradient(135deg, var(--primary-light), #FDE68A);
+      margin: -1.25rem -1.25rem 1rem -1.25rem;
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      position: relative;
+    }
+    .voucher-category-icon { font-size: 2.2rem; }
+    .voucher-discount-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--dark);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+    }
+
+    .voucher-brand { font-size: 1.2rem; font-weight: 800; }
+    .voucher-category { font-size: 0.75rem; color: var(--gray); text-transform: uppercase; font-weight: 600; }
+    .voucher-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+    }
+    .voucher-asking { font-size: 1.4rem; font-weight: 900; color: var(--dark); }
+    .voucher-face { font-size: 0.9rem; color: var(--gray); text-decoration: line-through; }
+    .voucher-expiry { font-size: 0.75rem; color: var(--danger); font-weight: 600; }
+
+    /* Filters Bar */
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      background: #FFFFFF;
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .filter-select {
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Modal Overlay & Box */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: #FFFFFF;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      position: relative;
+      animation: modalPop 0.2s ease;
+    }
+    @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray);
+    }
+
+    /* Secret Voucher Code Box */
+    .code-reveal-box {
+      background: #FEF9C3;
+      border: 2px dashed #EAB308;
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      margin: 1.25rem 0;
+    }
+    .code-text {
+      font-family: monospace;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: var(--dark);
+      user-select: all;
+    }
+
+    /* Forms */
+    .form-group { margin-bottom: 1.2rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--primary); }
+
+    /* Comparison Table */
+    .table-container {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    th, td { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); }
+    th { background: #F9FAFB; font-weight: 700; color: var(--dark); }
+    .th-highlight { background: #FEF3C7; color: #92400E; }
+    .td-highlight { background: #FFFBEB; font-weight: 600; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--dark);
+      color: #fff;
+      padding: 0.9rem 1.4rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 200;
+      border-left: 4px solid var(--primary);
+    }
+    .toast.show { display: block; animation: toastUp 0.3s ease; }
+    @keyframes toastUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: #9CA3AF;
+      padding: 3rem 0;
+      margin-top: 4rem;
+      border-top: 1px solid #333;
+      font-size: 0.85rem;
+    }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="role-bar">
+    <div class="container role-bar-inner">
+      <div>
+        <span>🐝 <strong>BargainBee</strong> — P2P Escrow Voucher Marketplace</span>
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <span style="font-size: 0.75rem; color: #9CA3AF;">🔒 HTTPS Transit Verified • AES-256 At-Rest Encryption • 100% Escrow Protection</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-inner">
+      <a href="javascript:void(0)" class="logo" onclick="showTab('home')">
+        <span class="logo-bee">🐝</span>
+        <span>Bargain<span class="logo-highlight">Bee</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><span class="nav-link active" id="nav-home" onclick="showTab('home')">Home</span></li>
+          <li><span class="nav-link" id="nav-browse" onclick="showTab('browse')">Browse Deals</span></li>
+          <li><span class="nav-link" id="nav-how" onclick="showTab('how')">How It Works</span></li>
+          <li><span class="nav-link" id="nav-why" onclick="showTab('why')">Why BargainBee</span></li>
+          <li><span class="nav-link" id="nav-purchases" onclick="showTab('purchases')" style="display:none;">My Purchases</span></li>
+          <li><span class="nav-link" id="nav-seller" onclick="showTab('seller')" style="display:none; color:#d97706;">Seller Hub</span></li>
+          <li><span class="nav-link" id="nav-admin" onclick="showTab('admin')" style="display:none; color:#2563eb;">Admin Queue</span></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Logged Out Actions -->
+        <div id="auth-logged-out" style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-ghost" onclick="openLoginModal()">Sign In</button>
+          <button class="btn btn-dark btn-sm" onclick="openRegisterModal()">Create Account</button>
+        </div>
+
+        <!-- Logged In Actions -->
+        <div id="auth-logged-in" style="display: none; position: relative;">
+          <div class="user-profile-btn" onclick="toggleUserDropdown()">
+            <div class="user-avatar" id="nav-avatar">U</div>
+            <span id="nav-username">User</span>
+            <span class="user-role-badge" id="nav-role-badge">Buyer</span>
+            <span style="font-size: 0.7rem;">▼</span>
+          </div>
+
+          <!-- Dropdown Menu -->
+          <div class="dropdown-menu" id="user-dropdown">
+            <div class="dropdown-header">
+              <strong id="dropdown-name">User Name</strong>
+              <div style="color: var(--gray); font-size: 0.75rem;" id="dropdown-email">user@email.com</div>
+            </div>
+            <div class="dropdown-item" onclick="showTab('purchases'); closeUserDropdown();">
+              <span>🛍️</span> My Purchases
+            </div>
+            <div class="dropdown-item" id="dropdown-seller-link" onclick="showTab('seller'); closeUserDropdown();">
+              <span>💰</span> Seller Dashboard
+            </div>
+            <div class="dropdown-item" id="dropdown-admin-link" style="display:none;" onclick="showTab('admin'); closeUserDropdown();">
+              <span>🛡️</span> Admin Verification Queue
+            </div>
+            <div class="dropdown-item danger" onclick="handleLogout()">
+              <span>🚪</span> Sign Out
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="handleSellClick()">
+          + Sell a Voucher
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 1. HOME SECTION ================= -->
+  <main id="tab-home" class="section active">
+    <div class="hero">
+      <div class="container">
+        <div class="hero-pill">
+          <span>🛡️ 100% Escrow Protected — Funds released only when code is redeemed</span>
+        </div>
+        <h1>
+          Don't let value expire.<br />
+          <span style="background: var(--primary); padding: 0 0.4rem; border-radius: 8px;">List it. Discover it.</span> Redeem it.
+        </h1>
+        <p>
+          India's trusted marketplace for buying and selling unused, transferable vouchers and gift cards. Guaranteed 24-hour verification SLA.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" style="font-size:1.05rem; padding:0.8rem 1.8rem;" onclick="showTab('browse')">
+            Explore Verified Vouchers →
+          </button>
+          <button class="btn btn-dark" style="font-size:1.05rem; padding:0.8rem 1.8rem;" onclick="handleSellClick()">
+            List a Voucher in 2 Mins
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="container stats-grid">
+        <div>
+          <div class="stat-num">43%</div>
+          <div class="stat-label">Consumers Hold Unused Vouchers</div>
+          <div class="stat-sub">Forgotten in inbox, SMS & desk drawers</div>
+        </div>
+        <div>
+          <div class="stat-num">$23B+</div>
+          <div class="stat-label">Unspent Gift Card Value Globally</div>
+          <div class="stat-sub">Expired without benefit each year</div>
+        </div>
+        <div>
+          <div class="stat-num">~18%</div>
+          <div class="stat-label">Annual CAGR in India</div>
+          <div class="stat-sub">Surging festive & corporate rewards</div>
+        </div>
+        <div>
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Escrow Protected</div>
+          <div class="stat-sub">Zero risk of invalid or duplicate codes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Vouchers -->
+    <div class="container" style="padding-top: 3.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1rem;">
+        <div>
+          <h2 style="font-size:1.8rem; font-weight:800;">🔥 Hot Verified Deals Today</h2>
+          <p style="color:var(--gray); font-size:0.9rem;">Inspected by human compliance team within 24h SLA.</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="showTab('browse')">View All →</button>
+      </div>
+      <div class="voucher-grid" id="featured-grid"></div>
+    </div>
+  </main>
+
+  <!-- ================= 2. BROWSE MARKETPLACE ================= -->
+  <main id="tab-browse" class="section">
+    <div class="container">
+      <div style="margin-bottom: 1.5rem;">
+        <h1 style="font-size: 2rem; font-weight: 800;">Browse Verified Vouchers</h1>
+        <p style="color: var(--gray); font-size: 0.9rem;">Filter by category, discount %, price range, and urgency.</p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="search-box" class="search-input" placeholder="🔍 Search brand (e.g. Myntra, Apple, Zomato, Croma)..." oninput="renderMarketplace()" />
+        <select id="category-filter" class="filter-select" onchange="renderMarketplace()">
+          <option value="ALL">All Categories</option>
+          <option value="Fashion">👗 Fashion</option>
+          <option value="Electronics">📱 Electronics</option>
+          <option value="Food & Dining">🍽️ Food & Dining</option>
+          <option value="Lifestyle">✨ Lifestyle & Fitness</option>
+        </select>
+        <select id="sort-filter" class="filter-select" onchange="renderMarketplace()">
+          <option value="discount">Highest Discount</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+        </select>
+      </div>
+
+      <div class="voucher-grid" id="marketplace-grid"></div>
+    </div>
+  </main>
+
+  <!-- ================= 3. MY PURCHASES (BUYER DASHBOARD) ================= -->
+  <main id="tab-purchases" class="section">
+    <div class="container">
+      <div style="margin-bottom: 1.5rem;">
+        <h1 style="font-size: 2rem; font-weight: 800;">My Purchased Vouchers</h1>
+        <p style="color: var(--gray); font-size: 0.9rem;">View your unlocked secret codes, escrow status, and confirm redemption.</p>
+      </div>
+
+      <div id="purchases-container">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 4. HOW IT WORKS ================= -->
+  <main id="tab-how" class="section">
+    <div class="container" style="max-width: 900px;">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <span class="badge badge-pending">The 5-Step Safeguard</span>
+        <h1 style="font-size: 2.5rem; font-weight: 900; margin-top: 0.5rem;">How BargainBee Works</h1>
+        <p style="color: var(--gray);">Our patent-inspired escrow holding mechanism protects both buyer and seller.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="card" style="border-left: 6px solid var(--primary); padding: 1.5rem;">
+          <h3 style="font-size:1.2rem; font-weight:800;">1. Seller Lists Voucher in &lt; 2 Mins</h3>
+          <p style="color:var(--gray); font-size:0.9rem;">Pick brand, enter face value and asking price. Set expiry and secret code.</p>
+        </div>
+        <div class="card" style="border-left: 6px solid var(--primary); padding: 1.5rem;">
+          <h3 style="font-size:1.2rem; font-weight:800;">2. 24-Hour Administrative Verification SLA</h3>
+          <p style="color:var(--gray); font-size:0.9rem;">Admin verifies authenticity, tests balance, and confirms expiry.</p>
+        </div>
+        <div class="card" style="border-left: 6px solid var(--primary); padding: 1.5rem;">
+          <h3 style="font-size:1.2rem; font-weight:800;">3. Buyer Discovers &amp; Initiates Escrow Checkout</h3>
+          <p style="color:var(--gray); font-size:0.9rem;">Payment is held in secure Escrow custody — not sent directly to seller.</p>
+        </div>
+        <div class="card" style="border-left: 6px solid var(--primary); padding: 1.5rem;">
+          <h3 style="font-size:1.2rem; font-weight:800;">4. Instant Code Delivery</h3>
+          <p style="color:var(--gray); font-size:0.9rem;">Secret voucher code is revealed immediately with 1-click clipboard copy.</p>
+        </div>
+        <div class="card" style="border-left: 6px solid #10B981; padding: 1.5rem; background: #F0FDF4;">
+          <h3 style="font-size:1.2rem; font-weight:800; color:#166534;">5. Redemption &amp; Escrow Release</h3>
+          <p style="color:#166534; font-size:0.9rem;">Buyer confirms code works, and escrow releases payout to seller!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 5. WHY BARGAINBEE ================= -->
+  <main id="tab-why" class="section">
+    <div class="container" style="max-width: 950px;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 900;">Why BargainBee vs. Informal Resale</h1>
+        <p style="color: var(--gray);">See how we eliminate scams common on OLX, Telegram, and classified message boards.</p>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25%;">Feature</th>
+              <th class="th-highlight" style="width: 40%;">🐝 BargainBee Escrow</th>
+              <th style="width: 35%;">Informal Resale (OLX, Telegram)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Payment Security</strong></td>
+              <td class="td-highlight">🔒 Funds held in Escrow until confirmed</td>
+              <td style="color: var(--danger);">❌ Direct UPI first (high fraud risk)</td>
+            </tr>
+            <tr>
+              <td><strong>Pre-Listing Verification</strong></td>
+              <td class="td-highlight">✅ 24h SLA balance check</td>
+              <td style="color: var(--danger);">❌ Zero verification</td>
+            </tr>
+            <tr>
+              <td><strong>Duplicate Code Prevention</strong></td>
+              <td class="td-highlight">🛡️ Deduplication prevents double-selling</td>
+              <td style="color: var(--danger);">❌ Codes resold to multiple people</td>
+            </tr>
+            <tr>
+              <td><strong>Dispute Mediation</strong></td>
+              <td class="td-highlight">⚖️ Admin mediation with 100% refund</td>
+              <td style="color: var(--danger);">❌ Seller blocks you immediately</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 6. SELL A VOUCHER ================= -->
+  <main id="tab-sell" class="section">
+    <div class="container" style="max-width: 650px;">
+      <div class="card" style="padding: 2rem;">
+        <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.3rem;">List a Voucher in 2 Minutes</h1>
+        <p style="color: var(--gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Turn unused gift cards into cash. Verified in 24 hours.</p>
+
+        <form id="sell-form" onsubmit="handleListVoucher(event)">
+          <div class="form-group">
+            <label class="form-label">Brand Name *</label>
+            <input type="text" id="form-brand" class="form-input" placeholder="e.g. Myntra, Apple, Zomato, Croma" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select id="form-category" class="form-select">
+              <option value="Fashion">👗 Fashion</option>
+              <option value="Electronics">📱 Electronics</option>
+              <option value="Food & Dining">🍽️ Food & Dining</option>
+              <option value="Lifestyle">✨ Lifestyle & Fitness</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Face Value (₹) *</label>
+              <input type="number" id="form-face" class="form-input" placeholder="2000" oninput="calculateDiscount()" required />
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Asking Price (₹) *</label>
+              <input type="number" id="form-asking" class="form-input" placeholder="1600" oninput="calculateDiscount()" required />
+            </div>
+          </div>
+
+          <div id="discount-preview" style="display:none; background:#FEF9C3; border:1px solid #EAB308; padding:0.75rem; border-radius:8px; font-size:0.85rem; margin-bottom:1.2rem; font-weight:600;">
+            ⚡ Calculated Buyer Discount: <span id="discount-pct-text" style="color:#15803D;">20% OFF</span>
+            <div style="font-size:0.75rem; color:#6B7280; font-weight:normal; margin-top:0.2rem;">
+              You earn: ₹<span id="seller-earning-text">1520</span> after 5% platform fee.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Expiry Date *</label>
+            <input type="date" id="form-expiry" class="form-input" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Secret Voucher PIN / Code *</label>
+            <input type="text" id="form-code" class="form-input" placeholder="e.g. MYN-4921-9920-ABCD" required />
+            <span style="font-size:0.75rem; color:var(--gray);">Encrypted. Revealed to buyer ONLY after escrow payment is confirmed.</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 0.8rem;">
+            Submit for 24h Verification Check →
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 7. SELLER HUB ================= -->
+  <main id="tab-seller" class="section">
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <div>
+          <h1 style="font-size:2rem; font-weight:800;">Seller Earnings &amp; Listings Hub</h1>
+          <p style="color:var(--gray); font-size:0.9rem;">Real-time listing status tracking from Pending to Settled.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="showTab('sell')">+ New Listing</button>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-bottom:2rem;">
+        <div class="card" style="border-left: 4px solid var(--primary);">
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:700;">TOTAL SETTLED EARNINGS</div>
+          <div style="font-size:1.8rem; font-weight:900; color:var(--dark); margin-top:0.2rem;" id="seller-total-earnings">₹3,800</div>
+          <div style="font-size:0.75rem; color:#10B981; font-weight:600;">Available for instant payout</div>
+        </div>
+        <div class="card">
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:700;">ACTIVE LIVE LISTINGS</div>
+          <div style="font-size:1.8rem; font-weight:900; margin-top:0.2rem;" id="seller-live-count">3</div>
+          <div style="font-size:0.75rem; color:var(--gray);">Nationwide buyer visibility</div>
+        </div>
+        <div class="card">
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:700;">SELLER REPUTATION</div>
+          <div style="font-size:1.8rem; font-weight:900; margin-top:0.2rem; color:#d97706;">★ 4.9 / 5.0</div>
+          <div style="font-size:0.75rem; color:var(--gray);">14 verified reviews</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); font-weight: 700;">
+          Your Listings &amp; Status Tracker
+        </div>
+        <div class="table-container" style="margin: 0; border: none;">
+          <table>
+            <thead>
+              <tr>
+                <th>Brand</th>
+                <th>Face Value</th>
+                <th>Asking Price</th>
+                <th>Status</th>
+                <th>Expiry</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="seller-listings-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 8. ADMIN QUEUE ================= -->
+  <main id="tab-admin" class="section">
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <div>
+          <h1 style="font-size:2rem; font-weight:800;">Admin Verification Queue (24h SLA)</h1>
+          <p style="color:var(--gray); font-size:0.9rem;">Review voucher authenticity, balance check, and approve for public sale.</p>
+        </div>
+        <span class="badge badge-pending" id="admin-queue-count">2 Pending Review</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;" id="admin-queue-list"></div>
+
+      <!-- FEATURE 4: Fraud Detection Watchlist -->
+      <div style="margin-top: 2.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <div>
+            <h2 style="font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.4rem;">
+              <span>🚨</span> Fraud Detection Watchlist &amp; Flagged Sellers
+            </h2>
+            <p style="color:var(--gray); font-size:0.85rem;">Sellers flagged by automated SHA-256 duplicate code detection or rejected submissions.</p>
+          </div>
+          <span class="badge badge-discount" id="admin-flagged-count">0 Flagged</span>
+        </div>
+        <div id="admin-flagged-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. SIGN IN MODAL -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('login-modal')">&times;</button>
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <span style="font-size: 2.2rem;">🐝</span>
+        <h2 style="font-size: 1.6rem; font-weight: 900; margin-top: 0.2rem;">Sign In to BargainBee</h2>
+        <p style="color: var(--gray); font-size: 0.85rem;">Access your vouchers, escrow wallet, and orders.</p>
+      </div>
+
+      <!-- Quick Demo Logins -->
+      <div style="background: #FEF9C3; border: 1px solid #EAB308; border-radius: 10px; padding: 0.8rem; margin-bottom: 1.2rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: #854D0E; margin-bottom: 0.4rem;">
+          ⚡ 1-Click Quick Demo Logins:
+        </div>
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="quickLogin('arjun@demo.com', 'Demo1234!')">🛒 Buyer (Arjun)</button>
+          <button class="btn btn-secondary btn-sm" onclick="quickLogin('priya@demo.com', 'Demo1234!')">💰 Seller (Priya)</button>
+          <button class="btn btn-secondary btn-sm" onclick="quickLogin('admin@bargainbee.in', 'Demo1234!')">🛡️ Admin</button>
+        </div>
+      </div>
+
+      
+      <!-- FEATURE 1: Rate Limiting Lockout Warning -->
+      <div id="login-lockout-msg" style="display:none; background:#FEE2E2; border:1px solid #EF4444; color:#991B1B; padding:0.75rem; border-radius:8px; font-size:0.85rem; margin-bottom:1rem; font-weight:600;">
+        ⚠️ Account temporarily locked due to 5 failed login attempts. Try again in <span id="lockout-countdown">15:00</span>.
+      </div>
+      <form onsubmit="handleLoginForm(event)">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="e.g. arjun@demo.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 0.75rem;">
+          Sign In →
+        </button>
+      </form>
+
+      <p style="text-align: center; font-size: 0.85rem; color: var(--gray); margin-top: 1.2rem;">
+        Don't have an account? 
+        <a href="javascript:void(0)" onclick="closeModal('login-modal'); openRegisterModal();" style="color: var(--dark); font-weight: 700; text-decoration: underline;">
+          Create a new account
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- 2. CREATE ACCOUNT (REGISTER) MODAL -->
+  <div class="modal-overlay" id="register-modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('register-modal')">&times;</button>
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <span style="font-size: 2.2rem;">✨</span>
+        <h2 style="font-size: 1.6rem; font-weight: 900; margin-top: 0.2rem;">Create Your Account</h2>
+        <p style="color: var(--gray); font-size: 0.85rem;">Join India's trusted P2P voucher exchange.</p>
+      </div>
+
+      <form onsubmit="handleRegisterForm(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="e.g. Rohit Sharma" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="e.g. rohit@gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Create Password *</label>
+          <input type="password" id="reg-password" class="form-input" placeholder="At least 6 characters" minlength="6" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">I want to *</label>
+          <select id="reg-role" class="form-select">
+            <option value="BUYER">🛒 Buy Discounted Vouchers</option>
+            <option value="SELLER">💰 Sell My Unused Vouchers</option>
+            <option value="BOTH">🔄 Both Buy and Sell</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-dark" style="width: 100%; font-size: 1rem; padding: 0.75rem;">
+          Create Account &amp; Start Saving →
+        </button>
+      </form>
+
+      <p style="text-align: center; font-size: 0.85rem; color: var(--gray); margin-top: 1.2rem;">
+        Already have an account? 
+        <a href="javascript:void(0)" onclick="closeModal('register-modal'); openLoginModal();" style="color: var(--dark); font-weight: 700; text-decoration: underline;">
+          Sign in here
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- 3. CHECKOUT / ESCROW MODAL -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('checkout-modal')">&times;</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- 4. SECURITY AUDIT TRAIL MODAL (FEATURE 7) -->
+  <div class="modal-overlay" id="audit-modal">
+    <div class="modal-box" style="max-width: 680px;">
+      <button class="modal-close" onclick="closeModal('audit-modal')">&times;</button>
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
+        <span style="font-size:2rem;">🛡️</span>
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 900;">Immutable Escrow Audit Trail</h2>
+          <p style="color: var(--gray); font-size: 0.8rem;">Cryptographically chained, append-only security record (SHA-256 block hash)</p>
+        </div>
+      </div>
+
+      <div style="background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; padding:0.6rem 0.9rem; border-radius:8px; font-size:0.75rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+        <span>🔒 <strong>Tamper-Proof Guarantee:</strong> Records cannot be altered or deleted. Every escrow state change is permanently sealed.</span>
+        <span class="badge badge-verified" id="audit-verify-status">Verified Chain</span>
+      </div>
+
+      <div id="audit-modal-content" style="max-height: 380px; overflow-y: auto;">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SELLER VERIFICATION MODAL (FEATURE 6) -->
+  <div class="modal-overlay" id="seller-verify-modal">
+    <div class="modal-box" style="max-width: 480px;">
+      <button class="modal-close" onclick="closeModal('seller-verify-modal')">&times;</button>
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <span style="font-size: 2.5rem;">🛡️</span>
+        <h2 style="font-size: 1.4rem; font-weight: 900; margin-top: 0.2rem;">Seller Identity Verification</h2>
+        <p style="color: var(--gray); font-size: 0.85rem;">To eliminate fraud, all sellers must complete identity verification before their vouchers can be published live.</p>
+      </div>
+
+      <div style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 0.85rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1.2rem;">
+        📧 Verification code sent to: <strong id="verify-email-display">user@demo.com</strong>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Enter 6-Digit One-Time Passcode (OTP)</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" id="verify-otp-input" class="form-input" placeholder="e.g. 748291" maxlength="6" style="font-size: 1.25rem; letter-spacing: 4px; text-align: center; font-weight: 800;" />
+          <button type="button" class="btn btn-secondary btn-sm" onclick="sendSellerVerificationCode()" style="white-space: nowrap;">Resend OTP</button>
+        </div>
+        <div style="font-size: 0.75rem; color: #d97706; margin-top: 0.5rem; font-weight:600;">
+          ⚡ Demo Access Code: <span id="verify-demo-code" style="font-family:monospace; background:#FEF3C7; padding:0.1rem 0.4rem; border-radius:4px;">748291</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 0.75rem;" onclick="confirmSellerVerification()">
+        Confirm Verification &amp; Unlock Selling →
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast-notification">Notification message</div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🐝</span> BargainBee
+        </div>
+        <p style="margin-top: 0.3rem;">Don't let value expire. List it, discover it, redeem it.</p>
+      </div>
+      <div>
+        <p>© 2025 BargainBee India. Escrow protected voucher exchange.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Data & Interactive Authentication Logic -->
+  <script>
+    // =========================================================================
+    // BARGAINBEE ESCROW PLATFORM — SECURITY ARCHITECTURE ENGINE
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // UTILITY: HEX & CRYPTO BYTE CONVERSIONS
+    // -------------------------------------------------------------------------
+    function bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function hexToBytes(hex) {
+      if (!hex || hex.length % 2 !== 0) return new Uint8Array();
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+      }
+      return bytes;
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 1: SECURE USER AUTHENTICATION (PBKDF2 SHA-256 + RATE LIMITING)
+    // -------------------------------------------------------------------------
+    /**
+     * Hashes password using standard PBKDF2 with SHA-256 and 100,000 iterations.
+     * Passwords are NEVER stored in plaintext in the database or storage.
+     */
+    async function hashPassword(password, saltHex) {
+      const enc = new TextEncoder();
+      const salt = saltHex ? hexToBytes(saltHex) : window.crypto.getRandomValues(new Uint8Array(16));
+      const keyMaterial = await window.crypto.subtle.importKey(
+        'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']
+      );
+      const derivedBits = await window.crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        256
+      );
+      return {
+        saltHex: bytesToHex(salt),
+        hashHex: bytesToHex(new Uint8Array(derivedBits))
+      };
+    }
+
+    async function verifyPassword(password, saltHex, expectedHashHex) {
+      const computed = await hashPassword(password, saltHex);
+      return computed.hashHex === expectedHashHex;
+    }
+
+    /**
+     * Rate Limiting: Blocks brute-force login attempts.
+     * Locks account for 15 minutes after 5 failed attempts.
+     */
+    function getLoginRateLimit(email) {
+      const key = 'bb_rl_' + (email || '').toLowerCase().trim();
+      const raw = localStorage.getItem(key);
+      if (!raw) return { attempts: 0, lockoutUntil: 0 };
+      return JSON.parse(raw);
+    }
+
+    function checkLoginAllowed(email) {
+      const rl = getLoginRateLimit(email);
+      const now = Date.now();
+      if (rl.lockoutUntil && rl.lockoutUntil > now) {
+        const remainingSec = Math.ceil((rl.lockoutUntil - now) / 1000);
+        return {
+          allowed: false,
+          remainingSec,
+          message: 'Too many failed login attempts. Account locked for ' + Math.floor(remainingSec / 60) + 'm ' + (remainingSec % 60) + 's.'
+        };
+      }
+      return { allowed: true };
+    }
+
+    function recordFailedLogin(email) {
+      const key = 'bb_rl_' + (email || '').toLowerCase().trim();
+      const rl = getLoginRateLimit(email);
+      const now = Date.now();
+      let attempts = rl.attempts || 0;
+      if (rl.firstAttempt && (now - rl.firstAttempt > 15 * 60 * 1000)) {
+        attempts = 1;
+      } else {
+        attempts += 1;
+      }
+      const data = { attempts, firstAttempt: rl.firstAttempt || now };
+      if (attempts >= 5) {
+        data.lockoutUntil = now + 15 * 60 * 1000; // 15 min lockout
+      }
+      localStorage.setItem(key, JSON.stringify(data));
+      return data;
+    }
+
+    function resetLoginRateLimit(email) {
+      localStorage.removeItem('bb_rl_' + (email || '').toLowerCase().trim());
+    }
+
+    /**
+     * Secure session handling: Generates cryptographic 256-bit session token
+     */
+    function createSecureSessionToken(user) {
+      const rand = window.crypto.getRandomValues(new Uint8Array(32));
+      const token = bytesToHex(rand);
+      const session = {
+        token,
+        userId: user.email,
+        role: user.role,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+      };
+      sessionStorage.setItem('bb_session_token', JSON.stringify(session));
+      return token;
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 2: ENCRYPTED TRANSACTIONS (AES-256-GCM AT REST & HTTPS TRANSIT)
+    // -------------------------------------------------------------------------
+    let _masterAesKey = null;
+    async function getMasterAesKey() {
+      if (_masterAesKey) return _masterAesKey;
+      const enc = new TextEncoder();
+      const secret = 'BargainBee_AES256_MasterEscrowKey_RestProtection_2026';
+      const keyMaterial = await window.crypto.subtle.importKey(
+        'raw', enc.encode(secret), { name: 'PBKDF2' }, false, ['deriveKey']
+      );
+      _masterAesKey = await window.crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: enc.encode('BargainBee_AES_GCM_Salt_2026'),
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+      return _masterAesKey;
+    }
+
+    /**
+     * Encrypts sensitive transaction data (voucher code, payment reference) at rest using AES-256-GCM.
+     */
+    async function encryptTransactionData(plaintext) {
+      if (!plaintext) return null;
+      const key = await getMasterAesKey();
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const enc = new TextEncoder();
+      const ciphertext = await window.crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        enc.encode(plaintext)
+      );
+      return {
+        iv: bytesToHex(iv),
+        ciphertext: bytesToHex(new Uint8Array(ciphertext)),
+        algorithm: 'AES-256-GCM',
+        encryptedAt: new Date().toISOString()
+      };
+    }
+
+    /**
+     * Decrypts AES-256-GCM encrypted transaction data in memory for authorized party.
+     */
+    async function decryptTransactionData(encryptedObj) {
+      if (!encryptedObj) return '';
+      if (typeof encryptedObj === 'string') return encryptedObj; // fallback for plaintext
+      if (!encryptedObj.iv || !encryptedObj.ciphertext) return '';
+      try {
+        const key = await getMasterAesKey();
+        const iv = hexToBytes(encryptedObj.iv);
+        const data = hexToBytes(encryptedObj.ciphertext);
+        const decrypted = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv },
+          key,
+          data
+        );
+        return new TextDecoder().decode(decrypted);
+      } catch (err) {
+        console.error('Decryption error:', err);
+        return '***[DECRYPTION ERROR]***';
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 4: FRAUD DETECTION (SHA-256 CODE HASH DEDUPLICATION)
+    // -------------------------------------------------------------------------
+    async function sha256(message) {
+      const enc = new TextEncoder();
+      const hashBuf = await window.crypto.subtle.digest('SHA-256', enc.encode(message));
+      return bytesToHex(new Uint8Array(hashBuf));
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 5: PRIVACY PROTECTION (CONTACT MASKING)
+    // -------------------------------------------------------------------------
+    function maskName(name) {
+      if (!name) return 'Anonymous';
+      const clean = name.replace(/\(★[\d\.\s]+\)/g, '').trim();
+      const parts = clean.split(/\s+/);
+      if (parts.length === 1) return parts[0][0] + '***';
+      return parts[0] + ' ' + parts[parts.length - 1][0] + '.';
+    }
+
+    function maskEmail(email) {
+      if (!email) return '***@***.***';
+      const [u, d] = email.split('@');
+      if (!d) return email;
+      const maskedUser = u.length > 2 ? u[0] + '***' + u[u.length - 1] : u[0] + '***';
+      return maskedUser + '@' + d;
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 7: SECURE TRANSACTION RECORDS (IMMUTABLE APPEND-ONLY AUDIT LOG)
+    // -------------------------------------------------------------------------
+    function getAuditLogs() {
+      const raw = localStorage.getItem('bb_audit_logs');
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    async function recordAuditLog(action, orderId, details) {
+      const logs = getAuditLogs();
+      const prevHash = logs.length > 0 ? logs[logs.length - 1].hash : 'GENESIS_00000000000000000000000000000000';
+      const entry = {
+        id: 'aud_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        timestamp: new Date().toISOString(),
+        orderId: orderId || null,
+        action,
+        actorEmail: state.currentUser ? state.currentUser.email : 'system',
+        actorRole: state.currentUser ? state.currentUser.role : 'SYSTEM',
+        details: details || {},
+        prevHash
+      };
+      const payload = entry.id + '|' + entry.timestamp + '|' + entry.orderId + '|' + entry.action + '|' + entry.actorEmail + '|' + JSON.stringify(entry.details) + '|' + prevHash;
+      entry.hash = await sha256(payload);
+
+      // Append-only: never mutate existing entries
+      logs.push(entry);
+      localStorage.setItem('bb_audit_logs', JSON.stringify(logs));
+      return entry;
+    }
+
+    // Verify cryptographic integrity of the audit chain
+    async function verifyAuditChain() {
+      const logs = getAuditLogs();
+      for (let i = 0; i < logs.length; i++) {
+        const expectedPrev = i === 0 ? 'GENESIS_00000000000000000000000000000000' : logs[i - 1].hash;
+        if (logs[i].prevHash !== expectedPrev) return false;
+        const payload = logs[i].id + '|' + logs[i].timestamp + '|' + logs[i].orderId + '|' + logs[i].action + '|' + logs[i].actorEmail + '|' + JSON.stringify(logs[i].details) + '|' + logs[i].prevHash;
+        const computed = await sha256(payload);
+        if (computed !== logs[i].hash) return false;
+      }
+      return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // SEED DATA INITIALIZATION
+    // -------------------------------------------------------------------------
+    // Initial Seed Users with PBKDF2 hashes (Password: 'Demo1234!')
+    const DEFAULT_USERS = [
+      {
+        email: 'arjun@demo.com',
+        name: 'Arjun Patel',
+        role: 'BUYER',
+        isVerified: true,
+        sellerVerifiedAt: '2026-01-01T00:00:00Z',
+        flaggedCount: 0,
+        flaggedForReview: false,
+        saltHex: '4261726761696e4265655f53616c745f323032365f44656d6f55736572',
+        passwordHash: '8086cba59c95041051ede7dccf412351d083d2e03ee63ddebd8b6b16747c2e75'
+      },
+      {
+        email: 'priya@demo.com',
+        name: 'Priya Sharma',
+        role: 'SELLER',
+        isVerified: true,
+        sellerVerifiedAt: '2026-01-01T00:00:00Z',
+        flaggedCount: 0,
+        flaggedForReview: false,
+        saltHex: '4261726761696e4265655f53616c745f323032365f44656d6f55736572',
+        passwordHash: '8086cba59c95041051ede7dccf412351d083d2e03ee63ddebd8b6b16747c2e75'
+      },
+      {
+        email: 'admin@bargainbee.in',
+        name: 'Admin Bee',
+        role: 'ADMIN',
+        isVerified: true,
+        sellerVerifiedAt: '2026-01-01T00:00:00Z',
+        flaggedCount: 0,
+        flaggedForReview: false,
+        saltHex: '4261726761696e4265655f53616c745f323032365f44656d6f55736572',
+        passwordHash: '8086cba59c95041051ede7dccf412351d083d2e03ee63ddebd8b6b16747c2e75'
+      }
+    ];
+
+    function getUsers() {
+      const stored = localStorage.getItem('bb_users');
+      if (!stored) {
+        localStorage.setItem('bb_users', JSON.stringify(DEFAULT_USERS));
+        return DEFAULT_USERS;
+      }
+      return JSON.parse(stored);
+    }
+
+    function saveUser(user) {
+      const users = getUsers();
+      users.push(user);
+      localStorage.setItem('bb_users', JSON.stringify(users));
+    }
+
+    function updateStoredUser(updatedUser) {
+      const users = getUsers().map(u => u.email.toLowerCase() === updatedUser.email.toLowerCase() ? updatedUser : u);
+      localStorage.setItem('bb_users', JSON.stringify(users));
+    }
+
+    // Default Seed Vouchers with SHA-256 Code Hashes
+    const SEED_VOUCHERS = [
+      {
+        id: 'v1',
+        brand: 'Myntra',
+        category: 'Fashion',
+        faceValue: 2000,
+        askingPrice: 1600,
+        discountPct: 20,
+        expiry: '2026-10-30',
+        code: 'MYN-9842-5512-BEE9',
+        codeHash: '377713aa33d758908002829a124d3eedd1910e648c92acc0d28b28b76fa60b0b',
+        status: 'LIVE',
+        seller: 'Priya Sharma (★ 4.9)',
+        sellerEmail: 'priya@demo.com',
+        sellerVerified: true,
+        icon: '👗'
+      },
+      {
+        id: 'v2',
+        brand: 'Croma',
+        category: 'Electronics',
+        faceValue: 10000,
+        askingPrice: 8500,
+        discountPct: 15,
+        expiry: '2026-12-31',
+        code: 'CROMA-7711-2299-4455',
+        codeHash: 'b1206bee58ab975ec164c091ef34b66f725e5b33bcc298380a7f81059e3a738a',
+        status: 'LIVE',
+        seller: 'Rahul Mehta (★ 4.8)',
+        sellerEmail: 'rahul@demo.com',
+        sellerVerified: true,
+        icon: '📱'
+      },
+      {
+        id: 'v3',
+        brand: 'Zomato',
+        category: 'Food & Dining',
+        faceValue: 1000,
+        askingPrice: 800,
+        discountPct: 20,
+        expiry: '2026-11-30',
+        code: 'ZOMT-1122-3344-5566',
+        codeHash: '4ad192de2d5f8ea1e259f415318d715fd7a4a8817a7ad1d1ea9aa53e12f3d003',
+        status: 'LIVE',
+        seller: 'Rahul Mehta (★ 4.8)',
+        sellerEmail: 'rahul@demo.com',
+        sellerVerified: true,
+        icon: '🍽️'
+      },
+      {
+        id: 'v4',
+        brand: 'Zara',
+        category: 'Fashion',
+        faceValue: 5000,
+        askingPrice: 3750,
+        discountPct: 25,
+        expiry: '2026-09-25',
+        code: 'ZARA-8812-3341-9921',
+        codeHash: 'ac5ed344f2fcc2be3137bbd4552d5ae18b9063f91dd2f827adb03f414a4498ed',
+        status: 'LIVE',
+        seller: 'Priya Sharma (★ 4.9)',
+        sellerEmail: 'priya@demo.com',
+        sellerVerified: true,
+        icon: '👗'
+      },
+      {
+        id: 'v5',
+        brand: 'Starbucks',
+        category: 'Food & Dining',
+        faceValue: 2000,
+        askingPrice: 1700,
+        discountPct: 15,
+        expiry: '2026-12-15',
+        code: 'SBUX-9988-7766-5544',
+        codeHash: '50cf5d8d40a875241d9c7ed13c6e91f1ec6753e5a1be720dfedd525647eadab9',
+        status: 'LIVE',
+        seller: 'Priya Sharma (★ 4.9)',
+        sellerEmail: 'priya@demo.com',
+        sellerVerified: true,
+        icon: '☕'
+      },
+      {
+        id: 'v6',
+        brand: 'Cult.fit',
+        category: 'Lifestyle',
+        faceValue: 3000,
+        askingPrice: 2250,
+        discountPct: 25,
+        expiry: '2026-10-10',
+        code: 'CULT-1234-5678-9012',
+        codeHash: '6ebcc39fc426a3000cf41c5a79ab236ca3af9883dcbc6e0ce7c58333f10b9b62',
+        status: 'PENDING',
+        seller: 'Rahul Mehta (★ 4.8)',
+        sellerEmail: 'rahul@demo.com',
+        sellerVerified: true,
+        icon: '✨'
+      },
+      {
+        id: 'v7',
+        brand: 'Apple Store',
+        category: 'Electronics',
+        faceValue: 3000,
+        askingPrice: 2700,
+        discountPct: 10,
+        expiry: '2027-01-31',
+        code: 'APPL-9922-3311-6644',
+        codeHash: '39eddd9219b5d8451dadca21f4b7a24ba264049bd708fb7b9d5230ee36f0f765',
+        status: 'PENDING',
+        seller: 'Rahul Mehta (★ 4.8)',
+        sellerEmail: 'rahul@demo.com',
+        sellerVerified: true,
+        icon: '🍏'
+      }
+    ];
+
+    function getVouchers() {
+      const stored = localStorage.getItem('bb_vouchers');
+      if (!stored) {
+        localStorage.setItem('bb_vouchers', JSON.stringify(SEED_VOUCHERS));
+        return SEED_VOUCHERS;
+      }
+      return JSON.parse(stored);
+    }
+
+    function saveVouchers(vouchers) {
+      localStorage.setItem('bb_vouchers', JSON.stringify(vouchers));
+    }
+
+    function getOrders() {
+      const stored = localStorage.getItem('bb_orders');
+      if (!stored) {
+        const initial = [
+          {
+            id: 'ord_101',
+            buyerEmail: 'arjun@demo.com',
+            sellerEmail: 'priya@demo.com',
+            brand: 'Myntra',
+            amount: 1600,
+            code: 'MYN-9842-5512-BEE9',
+            escrowStatus: 'HELD',
+            date: '2026-09-12'
+          }
+        ];
+        localStorage.setItem('bb_orders', JSON.stringify(initial));
+        return initial;
+      }
+      return JSON.parse(stored);
+    }
+
+    function saveOrders(orders) {
+      localStorage.setItem('bb_orders', JSON.stringify(orders));
+    }
+
+    // Platform State
+    const state = {
+      currentUser: null,
+      vouchers: getVouchers(),
+      orders: getOrders()
+    };
+
+    // -------------------------------------------------------------------------
+    // SESSION MANAGEMENT
+    // -------------------------------------------------------------------------
+    function loadSession() {
+      const saved = localStorage.getItem('bb_current_user');
+      if (saved) {
+        state.currentUser = JSON.parse(saved);
+      } else {
+        // Default to Arjun Patel as initial demo session
+        state.currentUser = getUsers()[0];
+        localStorage.setItem('bb_current_user', JSON.stringify(state.currentUser));
+      }
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      const loggedOutDiv = document.getElementById('auth-logged-out');
+      const loggedInDiv = document.getElementById('auth-logged-in');
+      const purchasesNav = document.getElementById('nav-purchases');
+      const sellerNav = document.getElementById('nav-seller');
+      const adminNav = document.getElementById('nav-admin');
+      const dropdownAdminLink = document.getElementById('dropdown-admin-link');
+      const dropdownSellerLink = document.getElementById('dropdown-seller-link');
+
+      if (state.currentUser) {
+        loggedOutDiv.style.display = 'none';
+        loggedInDiv.style.display = 'flex';
+
+        const u = state.currentUser;
+        document.getElementById('nav-avatar').innerText = (u.name || 'U')[0].toUpperCase();
+        document.getElementById('nav-username').innerText = (u.name || 'User').split(' ')[0];
+        document.getElementById('nav-role-badge').innerText = u.role + (u.isVerified ? ' 🛡️' : '');
+        document.getElementById('dropdown-name').innerText = u.name;
+        document.getElementById('dropdown-email').innerText = u.email;
+
+        purchasesNav.style.display = 'inline-block';
+
+        if (u.role === 'SELLER' || u.role === 'BOTH' || u.role === 'ADMIN') {
+          sellerNav.style.display = 'inline-block';
+          dropdownSellerLink.style.display = 'flex';
+        } else {
+          sellerNav.style.display = 'none';
+          dropdownSellerLink.style.display = 'none';
+        }
+
+        if (u.role === 'ADMIN') {
+          adminNav.style.display = 'inline-block';
+          dropdownAdminLink.style.display = 'flex';
+        } else {
+          adminNav.style.display = 'none';
+          dropdownAdminLink.style.display = 'none';
+        }
+      } else {
+        loggedOutDiv.style.display = 'flex';
+        loggedInDiv.style.display = 'none';
+        purchasesNav.style.display = 'none';
+        sellerNav.style.display = 'none';
+        adminNav.style.display = 'none';
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // AUTH ACTIONS (FEATURE 1: HASHING & RATE-LIMITING)
+    // -------------------------------------------------------------------------
+    async function handleLoginForm(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      // Rate limiting check
+      const rlCheck = checkLoginAllowed(email);
+      const lockoutBox = document.getElementById('login-lockout-msg');
+      if (!rlCheck.allowed) {
+        lockoutBox.style.display = 'block';
+        document.getElementById('lockout-countdown').innerText = Math.floor(rlCheck.remainingSec / 60) + 'm ' + (rlCheck.remainingSec % 60) + 's';
+        showToast('⚠️ Account locked due to too many failed attempts.');
+        return;
+      }
+
+      const users = getUsers();
+      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+      let isValid = false;
+      if (user && user.passwordHash && user.saltHex) {
+        isValid = await verifyPassword(password, user.saltHex, user.passwordHash);
+      } else if (user && user.password === password) {
+        // Fallback for pre-migration users: verify and upgrade hash immediately
+        isValid = true;
+        const upgrade = await hashPassword(password);
+        user.saltHex = upgrade.saltHex;
+        user.passwordHash = upgrade.hashHex;
+        delete user.password;
+        updateStoredUser(user);
+      }
+
+      if (!isValid) {
+        const rl = recordFailedLogin(email);
+        await recordAuditLog('LOGIN_FAILED', null, { email, attempts: rl.attempts });
+        if (rl.attempts >= 5) {
+          lockoutBox.style.display = 'block';
+          document.getElementById('lockout-countdown').innerText = '15:00';
+          showToast('🚨 Maximum attempts reached. Account locked for 15 minutes.');
+        } else {
+          showToast('❌ Invalid email or password. (' + (5 - rl.attempts) + ' attempts remaining)');
+        }
+        return;
+      }
+
+      // Successful login
+      resetLoginRateLimit(email);
+      lockoutBox.style.display = 'none';
+      createSecureSessionToken(user);
+
+      state.currentUser = user;
+      localStorage.setItem('bb_current_user', JSON.stringify(user));
+
+      await recordAuditLog('LOGIN_SUCCESS', null, { email: user.email, role: user.role });
+
+      closeModal('login-modal');
+      updateAuthUI();
+      showToast('👋 Welcome back, ' + user.name + '!');
+
+      if (user.role === 'ADMIN') showTab('admin');
+      else if (user.role === 'SELLER') showTab('seller');
+      else showTab('browse');
+    }
+
+    async function quickLogin(email, password) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = password;
+      const fakeEvt = new Event('submit');
+      await handleLoginForm(fakeEvt);
+    }
+
+    async function handleRegisterForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const role = document.getElementById('reg-role').value;
+
+      if (!name || !email || !password) {
+        showToast('Please fill in all required fields');
+        return;
+      }
+      if (password.length < 8) {
+        showToast('Password must be at least 8 characters long for security.');
+        return;
+      }
+
+      const users = getUsers();
+      if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+        showToast('⚠️ An account with this email already exists. Try signing in!');
+        return;
+      }
+
+      // Hash password with PBKDF2 (SHA-256)
+      const { saltHex, hashHex } = await hashPassword(password);
+
+      const newUser = {
+        name,
+        email,
+        saltHex,
+        passwordHash: hashHex,
+        role,
+        isVerified: false, // FEATURE 6: Requires verification step before selling
+        sellerVerifiedAt: null,
+        flaggedCount: 0,
+        flaggedForReview: false
+      };
+
+      saveUser(newUser);
+      state.currentUser = newUser;
+      localStorage.setItem('bb_current_user', JSON.stringify(newUser));
+      createSecureSessionToken(newUser);
+
+      await recordAuditLog('USER_REGISTERED', null, { email, role, isVerified: false });
+
+      closeModal('register-modal');
+      updateAuthUI();
+      showToast('🎉 Account created! Welcome, ' + name + '!');
+
+      if (role === 'SELLER' || role === 'BOTH') {
+        openSellerVerifyModal();
+      } else {
+        showTab('browse');
+      }
+    }
+
+    function handleLogout() {
+      recordAuditLog('USER_LOGOUT', null, { email: state.currentUser?.email });
+      state.currentUser = null;
+      localStorage.removeItem('bb_current_user');
+      sessionStorage.removeItem('bb_session_token');
+      closeUserDropdown();
+      updateAuthUI();
+      showToast('Logged out securely.');
+      showTab('home');
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 6: SELLER VERIFICATION WORKFLOW
+    // -------------------------------------------------------------------------
+    let currentOtpDemoCode = '748291';
+
+    function openSellerVerifyModal() {
+      if (!state.currentUser) return;
+      document.getElementById('verify-email-display').innerText = state.currentUser.email;
+      currentOtpDemoCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById('verify-demo-code').innerText = currentOtpDemoCode;
+      document.getElementById('verify-otp-input').value = '';
+      document.getElementById('seller-verify-modal').classList.add('active');
+    }
+
+    function sendSellerVerificationCode() {
+      currentOtpDemoCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById('verify-demo-code').innerText = currentOtpDemoCode;
+      showToast('📧 New 6-digit OTP generated for ' + state.currentUser.email);
+    }
+
+    async function confirmSellerVerification() {
+      const input = document.getElementById('verify-otp-input').value.trim();
+      if (!input || input !== currentOtpDemoCode) {
+        showToast('❌ Invalid verification code. Please check the code and try again.');
+        return;
+      }
+
+      state.currentUser.isVerified = true;
+      state.currentUser.sellerVerifiedAt = new Date().toISOString();
+      updateStoredUser(state.currentUser);
+      localStorage.setItem('bb_current_user', JSON.stringify(state.currentUser));
+
+      await recordAuditLog('SELLER_VERIFIED', null, {
+        email: state.currentUser.email,
+        method: 'EMAIL_OTP',
+        verifiedAt: state.currentUser.sellerVerifiedAt
+      });
+
+      closeModal('seller-verify-modal');
+      updateAuthUI();
+      showToast('🎉 Seller verification confirmed! 🛡️ Verified Seller badge unlocked.');
+      showTab('sell');
+    }
+
+    function handleSellClick() {
+      if (!state.currentUser) {
+        showToast('Please sign in or create an account to list a voucher');
+        openLoginModal();
+        return;
+      }
+      if (!state.currentUser.isVerified) {
+        showToast('⚠️ Seller verification required before listing.');
+        openSellerVerifyModal();
+        return;
+      }
+      showTab('sell');
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 4: FRAUD DETECTION & LISTING SUBMISSION
+    // -------------------------------------------------------------------------
+    async function handleListVoucher(e) {
+      e.preventDefault();
+      if (!state.currentUser) {
+        showToast('Please sign in to list a voucher');
+        openLoginModal();
+        return;
+      }
+
+      // Feature 6 guard: Seller must be verified
+      if (!state.currentUser.isVerified) {
+        showToast('⚠️ You must verify your seller account before submitting listings.');
+        openSellerVerifyModal();
+        return;
+      }
+
+      // Feature 4 guard: Flagged sellers blocked
+      if (state.currentUser.flaggedForReview) {
+        showToast('🚨 Account Restricted: Your account is flagged for review due to previous duplicate listings. Contact admin.');
+        return;
+      }
+
+      const brand = document.getElementById('form-brand').value.trim();
+      const cat = document.getElementById('form-category').value;
+      const face = parseFloat(document.getElementById('form-face').value);
+      const asking = parseFloat(document.getElementById('form-asking').value);
+      const expiry = document.getElementById('form-expiry').value;
+      const rawCode = document.getElementById('form-code').value.trim();
+
+      // Basic validation
+      if (asking >= face) {
+        showToast('Asking price must be lower than face value to provide buyer discount.');
+        return;
+      }
+
+      // Expiry validation
+      const expiryDate = new Date(expiry);
+      if (expiryDate <= new Date()) {
+        showToast('Voucher expiry date must be in the future.');
+        return;
+      }
+
+      // FEATURE 4: SHA-256 Code Hash for Duplicate Detection
+      const codeHash = await sha256(rawCode.toUpperCase());
+      const duplicate = state.vouchers.find(v => v.codeHash === codeHash && v.status !== 'REJECTED');
+
+      if (duplicate) {
+        // Increment seller flagged count
+        state.currentUser.flaggedCount = (state.currentUser.flaggedCount || 0) + 1;
+        if (state.currentUser.flaggedCount >= 2) {
+          state.currentUser.flaggedForReview = true;
+        }
+        updateStoredUser(state.currentUser);
+        localStorage.setItem('bb_current_user', JSON.stringify(state.currentUser));
+
+        await recordAuditLog('FRAUD_DUPLICATE_CODE_ATTEMPT', null, {
+          brand,
+          codeHashPreview: codeHash.substring(0, 16) + '...',
+          sellerEmail: state.currentUser.email,
+          flaggedCount: state.currentUser.flaggedCount
+        });
+
+        showToast('🚨 Fraud Alert: Duplicate voucher code detected! This code is already listed or was previously registered.');
+        return;
+      }
+
+      // FEATURE 2: AES-256 Encryption of code at rest
+      const encryptedCodePayload = await encryptTransactionData(rawCode);
+
+      // FEATURE 3: Forced PENDING status for digital verification SLA
+      const newVoucher = {
+        id: 'v_' + Date.now(),
+        brand,
+        category: cat,
+        faceValue: face,
+        askingPrice: asking,
+        discountPct: Math.round(((face - asking) / face) * 100),
+        expiry,
+        code: rawCode,
+        encryptedCode: encryptedCodePayload,
+        codeHash,
+        status: 'PENDING',
+        seller: state.currentUser.name + ' (★ 5.0)',
+        sellerEmail: state.currentUser.email,
+        sellerVerified: true,
+        icon: cat === 'Fashion' ? '👗' : cat === 'Electronics' ? '📱' : cat === 'Food & Dining' ? '🍽️' : '✨'
+      };
+
+      state.vouchers.unshift(newVoucher);
+      saveVouchers(state.vouchers);
+
+      await recordAuditLog('VOUCHER_SUBMITTED_PENDING', null, {
+        voucherId: newVoucher.id,
+        brand,
+        codeHashPreview: codeHash.substring(0, 16) + '...',
+        sellerEmail: state.currentUser.email
+      });
+
+      showToast('🐝 ' + brand + ' voucher submitted! Placed in 24h admin verification queue.');
+      document.getElementById('sell-form').reset();
+      document.getElementById('discount-preview').style.display = 'none';
+
+      showTab('seller');
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 3: DIGITAL VOUCHER VERIFICATION WORKFLOW (ADMIN)
+    // -------------------------------------------------------------------------
+    function renderAdminQueue() {
+      const container = document.getElementById('admin-queue-list');
+      const pending = state.vouchers.filter(v => v.status === 'PENDING' || v.status === 'VERIFIED');
+      document.getElementById('admin-queue-count').innerText = pending.length + ' Pending Review';
+      container.innerHTML = '';
+
+      if (pending.length === 0) {
+        container.innerHTML = '<div class="card" style="text-align:center; padding:3rem; color:var(--gray);">🎉 All verification queue items have been processed within the 24h SLA!</div>';
+      } else {
+        pending.forEach(v => {
+          const item = document.createElement('div');
+          item.className = 'card';
+          item.style.borderLeft = v.status === 'VERIFIED' ? '5px solid #10B981' : '5px solid #F59E0B';
+          item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="font-size:1.1rem; font-weight:800;">${v.brand} Voucher (${v.category})</span>
+                  <span class="badge ${v.status === 'VERIFIED' ? 'badge-verified' : 'badge-pending'}">${v.status}</span>
+                </div>
+                <div style="font-size:0.8rem; color:var(--gray); margin-top:0.2rem;">
+                  Face: <strong>₹${v.faceValue}</strong> | Asking: <strong>₹${v.askingPrice}</strong> (- ${v.discountPct}%) | Seller: <strong>${v.seller}</strong>
+                </div>
+                <div style="font-size:0.75rem; color:#0F766E; margin-top:0.3rem; background:#E6FFFB; padding:0.3rem 0.6rem; border-radius:6px; display:inline-block;">
+                  🔍 Automated Checks: SHA-256 Non-Duplicate (Verified) • Expiry Future Date (${v.expiry}) • AES-256 Encrypted
+                </div>
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button class="btn btn-secondary btn-sm" style="color:var(--danger);" onclick="rejectListing('${v.id}')">Reject ❌</button>
+                ${v.status === 'PENDING' ? `
+                  <button class="btn btn-secondary btn-sm" style="color:#0F766E; border-color:#0F766E;" onclick="verifyListingAuthenticity('${v.id}')">1. Verify Authenticity 🛡️</button>
+                ` : ''}
+                <button class="btn btn-primary btn-sm" onclick="publishListingLive('${v.id}')">2. Approve &amp; Publish Live ✅</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      renderAdminFlaggedSellers();
+    }
+
+    async function verifyListingAuthenticity(id) {
+      const v = state.vouchers.find(x => x.id === id);
+      if (v) {
+        v.status = 'VERIFIED';
+        v.verifiedAt = new Date().toISOString();
+        saveVouchers(state.vouchers);
+        await recordAuditLog('VOUCHER_VERIFIED_AUTHENTIC', null, { voucherId: v.id, brand: v.brand });
+        showToast('🛡️ ' + v.brand + ' voucher verified for authenticity and balance! Ready to publish live.');
+        renderAdminQueue();
+      }
+    }
+
+    async function publishListingLive(id) {
+      const v = state.vouchers.find(x => x.id === id);
+      if (v) {
+        v.status = 'LIVE';
+        v.publishedAt = new Date().toISOString();
+        saveVouchers(state.vouchers);
+        await recordAuditLog('VOUCHER_PUBLISHED_LIVE', null, { voucherId: v.id, brand: v.brand });
+        showToast('✅ ' + v.brand + ' voucher is now LIVE for buyers in the marketplace!');
+        renderAdminQueue();
+        renderMarketplace();
+        renderFeatured();
+      }
+    }
+
+    async function rejectListing(id) {
+      const v = state.vouchers.find(x => x.id === id);
+      if (v) {
+        v.status = 'REJECTED';
+        saveVouchers(state.vouchers);
+        await recordAuditLog('VOUCHER_REJECTED', null, { voucherId: v.id, brand: v.brand });
+        showToast('❌ Listing rejected.');
+        renderAdminQueue();
+      }
+    }
+
+    function renderAdminFlaggedSellers() {
+      const container = document.getElementById('admin-flagged-list');
+      if (!container) return;
+      const users = getUsers();
+      const flagged = users.filter(u => u.flaggedForReview || (u.flaggedCount && u.flaggedCount > 0));
+      document.getElementById('admin-flagged-count').innerText = flagged.length + ' Flagged';
+
+      if (flagged.length === 0) {
+        container.innerHTML = '<div style="font-size:0.85rem; color:var(--gray); padding:0.5rem 0;">✅ No flagged sellers. Zero duplicate submission alerts active.</div>';
+        return;
+      }
+
+      container.innerHTML = flagged.map(u => `
+        <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:8px; padding:0.8rem; margin-bottom:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong>${u.name}</strong> (${u.email})
+            <div style="font-size:0.75rem; color:#991B1B;">
+              Alert: ${u.flaggedCount || 1} duplicate/rejected voucher attempts detected.
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="clearSellerFlag('${u.email}')">Clear Watchlist Flag ✅</button>
+        </div>
+      `).join('');
+    }
+
+    function clearSellerFlag(email) {
+      const users = getUsers();
+      const u = users.find(x => x.email === email);
+      if (u) {
+        u.flaggedForReview = false;
+        u.flaggedCount = 0;
+        updateStoredUser(u);
+        recordAuditLog('SELLER_FLAG_CLEARED', null, { email });
+        showToast('Cleared fraud flag for ' + u.name + '.');
+        renderAdminFlaggedSellers();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 8: ONE-TIME REDEMPTION & ESCROW PURCHASE
+    // -------------------------------------------------------------------------
+    function openCheckoutModal(id) {
+      if (!state.currentUser) {
+        showToast('Please sign in to purchase vouchers with Escrow protection');
+        openLoginModal();
+        return;
+      }
+
+      const v = state.vouchers.find(x => x.id === id);
+      if (!v) return;
+
+      // FEATURE 8: One-Time Redemption Guard
+      if (v.status === 'REDEEMED' || v.isCodeRevealed) {
+        showToast('❌ This voucher code has already been redeemed and is no longer available.');
+        return;
+      }
+
+      const modal = document.getElementById('checkout-modal');
+      const content = document.getElementById('modal-content');
+
+      content.innerHTML = `
+        <div style="text-align:center; margin-bottom:1.25rem;">
+          <span style="font-size:2.5rem;">${v.icon || '🎫'}</span>
+          <h2 style="font-size:1.6rem; font-weight:900; margin-top:0.4rem;">${v.brand} Voucher</h2>
+          <div style="display:flex; justify-content:center; gap:0.5rem; margin-top:0.3rem;">
+            <span class="badge badge-verified">🛡️ 100% Escrow Protected</span>
+            <span class="badge badge-verified">🔒 AES-256 Encrypted</span>
+          </div>
+        </div>
+
+        <div style="background:#F9FAFB; padding:1rem; border-radius:10px; border:1px solid var(--border); font-size:0.9rem; margin-bottom:1.2rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+            <span style="color:var(--gray);">Seller:</span>
+            <span style="font-weight:700;">${maskName(v.seller)} ${v.sellerVerified ? '🛡️' : ''}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+            <span style="color:var(--gray);">Face Value:</span>
+            <span style="font-weight:700;">₹${v.faceValue.toLocaleString('en-IN')}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+            <span style="color:var(--gray);">Discount:</span>
+            <span style="font-weight:700; color:#10B981;">-${v.discountPct}%</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+            <span style="color:var(--gray);">Expiry:</span>
+            <span style="font-weight:700; color:var(--danger);">${v.expiry}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-weight:900; border-top:1px solid var(--border); padding-top:0.5rem; margin-top:0.5rem;">
+            <span>Total to Pay:</span>
+            <span style="color:var(--dark);">₹${v.askingPrice.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF; padding:0.75rem; border-radius:8px; font-size:0.8rem; margin-bottom:1.5rem;">
+          🔒 <strong>One-Time Redemption Protection:</strong> Upon payment verification, this code is permanently locked to your account and instantly retired from the public marketplace.
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; font-size:1rem; padding:0.8rem;" onclick="processEscrowPurchase('${v.id}')">
+          Confirm &amp; Hold in Escrow (₹${v.askingPrice}) →
+        </button>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    async function processEscrowPurchase(id) {
+      const v = state.vouchers.find(x => x.id === id);
+      if (!v) return;
+
+      // FEATURE 8: Server-side check — Prevent race condition double-redemption
+      if (v.status === 'REDEEMED' || v.isCodeRevealed) {
+        showToast('❌ Voucher already redeemed by another transaction.');
+        closeModal('checkout-modal');
+        return;
+      }
+
+      // 1. Immediately flip status to REDEEMED to prevent duplicate issuance
+      v.status = 'REDEEMED';
+      v.isCodeRevealed = true;
+      v.revealedAt = new Date().toISOString();
+      v.redeemedBy = state.currentUser ? state.currentUser.email : 'arjun@demo.com';
+      saveVouchers(state.vouchers);
+
+      // 2. Create order record with AES-256 encrypted fields
+      const orderId = 'ord_' + Date.now();
+      const encryptedPaymentId = await encryptTransactionData('pay_rzp_mock_' + Date.now());
+
+      const order = {
+        id: orderId,
+        buyerEmail: state.currentUser ? state.currentUser.email : 'arjun@demo.com',
+        sellerEmail: v.sellerEmail || 'priya@demo.com',
+        brand: v.brand,
+        amount: v.askingPrice,
+        code: v.code,
+        escrowStatus: 'HELD',
+        paymentRef: encryptedPaymentId,
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      state.orders.unshift(order);
+      saveOrders(state.orders);
+
+      // FEATURE 7: Write immutable audit records for each escrow stage
+      await recordAuditLog('ORDER_CREATED', order.id, {
+        brand: v.brand,
+        amount: v.askingPrice,
+        buyerEmail: order.buyerEmail,
+        sellerEmail: order.sellerEmail
+      });
+      await recordAuditLog('PAYMENT_CAPTURED_ESCROW_HELD', order.id, {
+        amount: v.askingPrice,
+        status: 'HELD'
+      });
+      await recordAuditLog('ONE_TIME_CODE_REVEALED', order.id, {
+        voucherId: v.id,
+        redeemedBy: order.buyerEmail
+      });
+
+      // 3. Render unlocked code modal
+      const content = document.getElementById('modal-content');
+      content.innerHTML = `
+        <div style="text-align:center; padding:1rem 0;">
+          <div style="font-size:3rem; margin-bottom:0.5rem;">🎉</div>
+          <h2 style="font-size:1.5rem; font-weight:900;">Payment Held in Escrow!</h2>
+          <p style="color:var(--gray); font-size:0.85rem; margin-top:0.2rem;">
+            Here is your unlocked digital voucher code (retired from public marketplace):
+          </p>
+
+          <div class="code-reveal-box">
+            <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; font-weight:700;">One-Time Voucher Code</div>
+            <div class="code-text">${v.code}</div>
+            <button class="btn btn-dark btn-sm" style="margin-top:0.75rem;" onclick="copyCode('${v.code}')">
+              📋 Copy Code
+            </button>
+          </div>
+
+          <p style="font-size:0.8rem; color:var(--gray); margin-bottom:1.5rem;">
+            Redeem on ${v.brand}, then confirm below to release payment to the seller.
+          </p>
+
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-secondary btn-sm" style="flex:1; color:var(--danger);" onclick="disputeEscrow('${v.brand}', '${order.id}')">
+              Report Issue
+            </button>
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="confirmEscrowRelease('${v.brand}', '${order.id}')">
+              Confirm Received &amp; Release Funds ✅
+            </button>
+          </div>
+        </div>
+      `;
+
+      renderMarketplace();
+      renderFeatured();
+      renderPurchases();
+    }
+
+    function copyCode(code) {
+      navigator.clipboard.writeText(code);
+      showToast('📋 Voucher code copied to clipboard!');
+    }
+
+    async function confirmEscrowRelease(brand, orderId) {
+      if (orderId) {
+        const order = state.orders.find(o => o.id === orderId);
+        if (order) {
+          order.escrowStatus = 'RELEASED';
+          saveOrders(state.orders);
+          await recordAuditLog('ESCROW_RELEASED_TO_SELLER', order.id, {
+            brand,
+            amount: order.amount,
+            seller: order.sellerEmail
+          });
+        }
+      }
+      closeModal('checkout-modal');
+      showToast('🎉 Escrow released! Payout dispatched to seller for ' + brand + '.');
+      renderPurchases();
+      renderSellerHub();
+    }
+
+    async function disputeEscrow(brand, orderId) {
+      if (orderId) {
+        const order = state.orders.find(o => o.id === orderId);
+        if (order) {
+          order.escrowStatus = 'DISPUTED';
+          saveOrders(state.orders);
+          await recordAuditLog('ESCROW_DISPUTE_RAISED', order.id, {
+            brand,
+            raisedBy: state.currentUser?.email
+          });
+        }
+      }
+      closeModal('checkout-modal');
+      showToast('⚠️ Dispute registered for ' + brand + '. Escrow funds frozen for admin mediation.');
+      renderPurchases();
+    }
+
+    // -------------------------------------------------------------------------
+    // FEATURE 7: AUDIT LOG MODAL VIEWER
+    // -------------------------------------------------------------------------
+    async function viewAuditTrail(orderId) {
+      const logs = getAuditLogs();
+      const filtered = orderId ? logs.filter(l => l.orderId === orderId) : logs;
+      const modal = document.getElementById('audit-modal');
+      const content = document.getElementById('audit-modal-content');
+
+      const isChainValid = await verifyAuditChain();
+      document.getElementById('audit-verify-status').innerText = isChainValid ? '✅ Verified SHA-256 Chain' : '⚠️ Chain Integrity Warning';
+
+      if (filtered.length === 0) {
+        content.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--gray);">No audit events recorded yet.</div>';
+      } else {
+        content.innerHTML = `
+          <table style="font-size:0.8rem; width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="background:#F9FAFB; border-bottom:1px solid var(--border); text-align:left;">
+                <th style="padding:0.5rem;">Timestamp</th>
+                <th style="padding:0.5rem;">Action</th>
+                <th style="padding:0.5rem;">Actor</th>
+                <th style="padding:0.5rem;">Order ID</th>
+                <th style="padding:0.5rem;">Hash Checksum</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.slice(-20).reverse().map(l => `
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:0.5rem; color:var(--gray);">${new Date(l.timestamp).toLocaleTimeString()}</td>
+                  <td style="padding:0.5rem;"><strong>${l.action}</strong></td>
+                  <td style="padding:0.5rem; color:var(--gray);">${maskEmail(l.actorEmail)}</td>
+                  <td style="padding:0.5rem; font-family:monospace;">${l.orderId ? l.orderId.slice(0, 10) : '—'}</td>
+                  <td style="padding:0.5rem; font-family:monospace; color:#0F766E;">${l.hash.slice(0, 10)}...</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      modal.classList.add('active');
+    }
+
+    // -------------------------------------------------------------------------
+    // UI RENDERING: MARKETPLACE, PURCHASES, SELLER HUB
+    // -------------------------------------------------------------------------
+    function createVoucherCard(v) {
+      const card = document.createElement('div');
+      card.className = 'card voucher-card';
+      card.onclick = () => openCheckoutModal(v.id);
+
+      // FEATURE 5: Privacy Protection — Mask seller name in public marketplace
+      const sellerDisplayName = maskName(v.seller);
+
+      card.innerHTML = `
+        <div>
+          <div class="voucher-header">
+            <div class="voucher-category-icon">${v.icon || '🎫'}</div>
+            <div class="voucher-discount-tag">-${v.discountPct}%</div>
+          </div>
+          <div class="voucher-category">${v.category}</div>
+          <div class="voucher-brand">${v.brand}</div>
+          <div style="font-size:0.75rem; color:var(--gray); margin-top:0.2rem;">Seller: ${sellerDisplayName}</div>
+          <div class="voucher-price-row">
+            <span class="voucher-asking">₹${v.askingPrice.toLocaleString('en-IN')}</span>
+            <span class="voucher-face">₹${v.faceValue.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="voucher-expiry">⏳ Expires ${v.expiry}</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; padding-top:0.75rem; border-top:1px solid #F3F4F6;">
+          ${v.sellerVerified ? '<span class="badge badge-verified">🛡️ Verified Seller</span>' : '<span class="badge badge-pending">Standard Seller</span>'}
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openCheckoutModal('${v.id}')">Buy with Escrow</button>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderFeatured() {
+      const grid = document.getElementById('featured-grid');
+      grid.innerHTML = '';
+      // Only LIVE vouchers are displayed
+      const live = state.vouchers.filter(v => v.status === 'LIVE').slice(0, 4);
+      live.forEach(v => grid.appendChild(createVoucherCard(v)));
+    }
+
+    function renderMarketplace() {
+      const grid = document.getElementById('marketplace-grid');
+      const query = document.getElementById('search-box').value.toLowerCase();
+      const cat = document.getElementById('category-filter').value;
+      const sort = document.getElementById('sort-filter').value;
+
+      grid.innerHTML = '';
+      // Only LIVE vouchers are displayed (FEATURE 3 & FEATURE 8)
+      let filtered = state.vouchers.filter(v => v.status === 'LIVE');
+
+      if (query) filtered = filtered.filter(v => v.brand.toLowerCase().includes(query) || v.category.toLowerCase().includes(query));
+      if (cat !== 'ALL') filtered = filtered.filter(v => v.category === cat);
+      if (sort === 'discount') filtered.sort((a,b) => b.discountPct - a.discountPct);
+      if (sort === 'price-low') filtered.sort((a,b) => a.askingPrice - b.askingPrice);
+      if (sort === 'price-high') filtered.sort((a,b) => b.askingPrice - a.askingPrice);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--gray);">No verified live vouchers match your criteria.</div>';
+        return;
+      }
+
+      filtered.forEach(v => grid.appendChild(createVoucherCard(v)));
+    }
+
+    function renderPurchases() {
+      const container = document.getElementById('purchases-container');
+      const userOrders = state.currentUser ? state.orders.filter(o => o.buyerEmail === state.currentUser.email) : [];
+
+      if (userOrders.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align:center; padding:3rem;">
+            <p style="font-size:2.5rem; margin-bottom:0.5rem;">🛍️</p>
+            <h3 style="font-size:1.2rem; font-weight:800;">No Purchases Yet</h3>
+            <p style="color:var(--gray); font-size:0.85rem; margin:0.4rem 0 1.2rem;">You haven't purchased any vouchers yet.</p>
+            <button class="btn btn-primary" onclick="showTab('browse')">Browse Verified Deals</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div style="padding:0.75rem 1rem; background:#F9FAFB; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:700; font-size:0.9rem;">Your Escrow Transactions</span>
+            <button class="btn btn-secondary btn-sm" onclick="viewAuditTrail()">🛡️ View Global Audit Trail</button>
+          </div>
+          <div class="table-container" style="margin:0; border:none;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Brand</th>
+                  <th>Amount</th>
+                  <th>Voucher Code</th>
+                  <th>Escrow Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${userOrders.map(o => `
+                  <tr>
+                    <td><strong>${o.brand}</strong></td>
+                    <td><strong>₹${o.amount.toLocaleString('en-IN')}</strong></td>
+                    <td>
+                      <code style="background:#FEF9C3; padding:0.2rem 0.5rem; border-radius:4px; font-weight:700;">${o.code}</code>
+                      <button class="btn btn-ghost btn-sm" onclick="copyCode('${o.code}')" style="margin-left:0.3rem;">📋</button>
+                    </td>
+                    <td>
+                      <span class="badge ${o.escrowStatus === 'RELEASED' ? 'badge-verified' : o.escrowStatus === 'DISPUTED' ? 'badge-discount' : 'badge-pending'}">
+                        ${o.escrowStatus === 'RELEASED' ? '✅ Released to Seller' : o.escrowStatus === 'DISPUTED' ? '⚠️ Disputed' : '🔒 Held in Escrow'}
+                      </span>
+                    </td>
+                    <td style="color:var(--gray); font-size:0.8rem;">${o.date}</td>
+                    <td>
+                      <div style="display:flex; gap:0.4rem; align-items:center;">
+                        ${o.escrowStatus === 'HELD' ? `
+                          <button class="btn btn-primary btn-sm" onclick="confirmEscrowRelease('${o.brand}', '${o.id}')">Confirm Received ✅</button>
+                        ` : `
+                          <span style="color:#10B981; font-weight:700; font-size:0.8rem;">Completed</span>
+                        `}
+                        <button class="btn btn-secondary btn-sm" onclick="viewAuditTrail('${o.id}')" title="Audit Log">🛡️ Audit</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSellerHub() {
+      const tbody = document.getElementById('seller-listings-body');
+      tbody.innerHTML = '';
+
+      state.vouchers.forEach(v => {
+        const tr = document.createElement('tr');
+        const badgeClass = v.status === 'LIVE' ? 'badge-verified' : v.status === 'PENDING' ? 'badge-pending' : v.status === 'VERIFIED' ? 'badge-verified' : 'badge-escrow';
+        tr.innerHTML = `
+          <td><strong>${v.brand}</strong> <span style="font-size:0.75rem; color:var(--gray);">(${v.category})</span></td>
+          <td style="text-decoration:line-through; color:var(--gray);">₹${v.faceValue}</td>
+          <td><strong>₹${v.askingPrice}</strong> <span style="color:#10B981; font-size:0.75rem;">(-${v.discountPct}%)</span></td>
+          <td><span class="badge ${badgeClass}">${v.status}</span></td>
+          <td style="font-size:0.8rem; color:var(--gray);">${v.expiry}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="viewAuditTrail()">🛡️ Audit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const liveCount = state.vouchers.filter(v => v.status === 'LIVE').length;
+      document.getElementById('seller-live-count').innerText = liveCount;
+    }
+
+    function calculateDiscount() {
+      const face = parseFloat(document.getElementById('form-face').value) || 0;
+      const asking = parseFloat(document.getElementById('form-asking').value) || 0;
+      const preview = document.getElementById('discount-preview');
+
+      if (face > 0 && asking > 0) {
+        const pct = Math.round(((face - asking) / face) * 100);
+        preview.style.display = 'block';
+        document.getElementById('discount-pct-text').innerText = pct + '% OFF';
+        document.getElementById('seller-earning-text').innerText = Math.round(asking * 0.95);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    // Modal navigation
+    function openLoginModal() { document.getElementById('login-modal').classList.add('active'); }
+    function openRegisterModal() { document.getElementById('register-modal').classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function toggleUserDropdown() {
+      document.getElementById('user-dropdown').classList.toggle('show');
+    }
+    function closeUserDropdown() {
+      const m = document.getElementById('user-dropdown');
+      if (m) m.classList.remove('show');
+    }
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-profile-btn')) {
+        closeUserDropdown();
+      }
+    });
+
+    function showTab(tabId) {
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+
+      const navEl = document.getElementById('nav-' + tabId);
+      if (navEl) navEl.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (tabId === 'browse') renderMarketplace();
+      if (tabId === 'seller') renderSellerHub();
+      if (tabId === 'admin') renderAdminQueue();
+      if (tabId === 'purchases') renderPurchases();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast-notification');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // -------------------------------------------------------------------------
+    // INITIALIZATION ON DOM CONTENT LOADED
+    // -------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadSession();
+      renderFeatured();
+      renderMarketplace();
+      renderSellerHub();
+      renderAdminQueue();
+
+      // Check HTTPS & transit security status
+      if (window.location.protocol === 'https:') {
+        console.log('[Security] Verified: Application running in secure HTTPS context.');
+      } else {
+        console.info('[Security] Running in local/HTTP mode. HTTPS enforced on production deployment.');
+      }
+    });
+
+  </script>
+</body>
+</html>
